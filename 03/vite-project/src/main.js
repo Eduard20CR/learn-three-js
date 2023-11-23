@@ -1,6 +1,6 @@
 import "./../style.css";
 import * as THREE from "three";
-import gsap from "gsap";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 // SIZES
 const sizes = {
@@ -27,8 +27,12 @@ scene.add(cube);
 const aspectRatio = sizes.width / sizes.heigth;
 const camera = new THREE.PerspectiveCamera(75, aspectRatio);
 camera.position.z = 3;
-camera.lookAt(cube.position);
 scene.add(camera);
+
+// ORBIT CONTROLS
+const controlls = new OrbitControls(camera, canvas);
+controlls.enableDamping = true;
+controlls.enablePan = true;
 
 // RENDERER
 const renderer = new THREE.WebGLRenderer({
@@ -41,9 +45,11 @@ const clock = new THREE.Clock();
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
 
-  camera.lookAt(cube.position);
-  camera.position.y = Math.sin(elapsedTime);
-  camera.position.x = Math.cos(elapsedTime);
+  // camera.position.x = Math.sin(cursor.x * Math.PI * 2) * cameraRadious;
+  // camera.position.z = Math.cos(cursor.x * Math.PI * 2) * cameraRadious;
+  // camera.position.y = cursor.y * movementReach * -1;
+
+  controlls.update();
 
   renderer.render(scene, camera);
   window.requestAnimationFrame(tick);
