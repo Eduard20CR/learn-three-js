@@ -16,18 +16,17 @@ const scene = new THREE.Scene();
 
 // HELPER
 const axesHelper = new THREE.AxesHelper(5);
-scene.add(axesHelper);
+// scene.add(axesHelper);
 
 // OBJECT
 
-const cube = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({ color: "red" }));
+const cube = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({ color: "red", wireframe: true }));
 scene.add(cube);
 
 // CAMERA
-const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.heigth);
-camera.position.z = 2;
-camera.position.x = 2;
-camera.position.y = 2;
+const aspectRatio = sizes.width / sizes.heigth;
+const camera = new THREE.PerspectiveCamera(75, aspectRatio);
+camera.position.z = 3;
 camera.lookAt(cube.position);
 scene.add(camera);
 
@@ -42,7 +41,9 @@ const clock = new THREE.Clock();
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
 
-  cube.rotation.y = elapsedTime;
+  camera.lookAt(cube.position);
+  camera.position.y = Math.sin(elapsedTime);
+  camera.position.x = Math.cos(elapsedTime);
 
   renderer.render(scene, camera);
   window.requestAnimationFrame(tick);
