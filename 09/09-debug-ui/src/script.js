@@ -1,6 +1,10 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import gsap from "gsap";
+import GUI from "lil-gui";
+
+const gui = new GUI();
+const debugObject = {};
 
 /**
  * Base
@@ -14,10 +18,32 @@ const scene = new THREE.Scene();
 /**
  * Object
  */
+debugObject.color = "#3b48b0";
 const geometry = new THREE.BoxGeometry(1, 1, 1, 2, 2, 2);
-const material = new THREE.MeshBasicMaterial({ color: "#ff0000", wireframe: true });
+const material = new THREE.MeshBasicMaterial({ color: debugObject.color, wireframe: true });
 const mesh = new THREE.Mesh(geometry, material);
 scene.add(mesh);
+
+gui.add(mesh.position, "y").min(-3).max(3).step(0.01).name("elevation");
+gui.add(mesh, "visible");
+gui.add(material, "wireframe");
+gui.addColor(debugObject, "color").onChange((e) => {
+  material.color.set(e);
+});
+debugObject.subdivision = 2;
+gui
+  .add(debugObject, "subdivision")
+  .min(1)
+  .max(20)
+  .step(1)
+  .onFinishChange((e) => {
+    mesh.geometry = new THREE.BoxGeometry(mesh.scale.x, mesh.scale.y, mesh.scale.z, e, e, e);
+  });
+
+debugObject.spin = () => {
+  gsap.to(mesh.rotation, { y: mesh.rotation.y + Math.PI * 2, duration: 1.5, ease: "power1.inOut" });
+};
+gui.add(debugObject, "spin");
 
 /**
  * Sizes
@@ -81,5 +107,4 @@ const tick = () => {
   // Call tick again on the next frame
   window.requestAnimationFrame(tick);
 };
-
 tick();
