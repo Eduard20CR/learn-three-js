@@ -3,7 +3,11 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import gsap from "gsap";
 import GUI from "lil-gui";
 
-const gui = new GUI();
+const gui = new GUI({ width: 500, title: "Nice GUI", closeFolders: false });
+// gui.close();
+window.addEventListener("keydown", (e) => {
+  if (e.key == "h") gui.show(gui._hidden);
+});
 const debugObject = {};
 
 /**
@@ -24,26 +28,28 @@ const material = new THREE.MeshBasicMaterial({ color: debugObject.color, wirefra
 const mesh = new THREE.Mesh(geometry, material);
 scene.add(mesh);
 
-gui.add(mesh.position, "y").min(-3).max(3).step(0.01).name("elevation");
-gui.add(mesh, "visible");
-gui.add(material, "wireframe");
-gui.addColor(debugObject, "color").onChange((e) => {
+const cubeGUI = gui.addFolder("Cube");
+cubeGUI.add(mesh.position, "y").min(-3).max(3).step(0.01).name("elevation");
+cubeGUI.add(mesh, "visible");
+cubeGUI.add(material, "wireframe");
+cubeGUI.addColor(debugObject, "color").onChange((e) => {
   material.color.set(e);
 });
 debugObject.subdivision = 2;
-gui
+cubeGUI
   .add(debugObject, "subdivision")
   .min(1)
   .max(20)
   .step(1)
   .onFinishChange((e) => {
+    mesh.geometry.dispose();
     mesh.geometry = new THREE.BoxGeometry(mesh.scale.x, mesh.scale.y, mesh.scale.z, e, e, e);
   });
 
 debugObject.spin = () => {
   gsap.to(mesh.rotation, { y: mesh.rotation.y + Math.PI * 2, duration: 1.5, ease: "power1.inOut" });
 };
-gui.add(debugObject, "spin");
+cubeGUI.add(debugObject, "spin");
 
 /**
  * Sizes
