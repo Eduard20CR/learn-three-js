@@ -14,14 +14,29 @@ const scene = new THREE.Scene();
  * Object
  */
 
-const imageColorSource = "/textures/door/color.jpg";
-const textureLoader = new THREE.TextureLoader();
-const texture = textureLoader.load(imageColorSource);
-texture.colorSpace = THREE.SRGBColorSpace;
+const loadingManager = new THREE.LoadingManager();
+const textureLoader = new THREE.TextureLoader(loadingManager);
 
-const material = new THREE.MeshBasicMaterial({ map: texture });
+const colorTexture = textureLoader.load("/textures/minecraft.png");
+// const colorTexture = textureLoader.load("/textures/door/color.jpg");
+colorTexture.colorSpace = THREE.SRGBColorSpace;
+// colorTexture.repeat.x = 2;
+// colorTexture.repeat.y = 3;
+// colorTexture.wrapS = THREE.RepeatWrapping;
+// colorTexture.wrapT = THREE.RepeatWrapping;
+// colorTexture.minFilter = THREE.NearestFilter;
+colorTexture.magFilter = THREE.NearestFilter;
+
+const alphaTexture = textureLoader.load("/textures/door/alpha.jpg");
+const heightTexture = textureLoader.load("/textures/door/height.jpg");
+const normalTexture = textureLoader.load("/textures/door/normal.jpg");
+const ambientOcclusionTexture = textureLoader.load("/textures/door/ambientOcclusion.jpg");
+const metalnessTexture = textureLoader.load("/textures/door/metalness.jpg");
+const roughnessTexture = textureLoader.load("/textures/door/roughness.jpg");
+const material = new THREE.MeshBasicMaterial({ map: colorTexture });
 
 const geometry = new THREE.BoxGeometry(1, 1, 1);
+
 const mesh = new THREE.Mesh(geometry, material);
 scene.add(mesh);
 
