@@ -1,5 +1,9 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
+import GUI from "lil-gui";
+
+const gui = new GUI();
 
 /**
  * Base
@@ -74,7 +78,7 @@ gradientTexture05.minFilter = THREE.NearestFilter;
 
 // MESH
 
-/*
+/*==============================================================
   - MeshBasicMaterial
     En este nos permite poner texturas y colores, y no se afecta por la luz
 */
@@ -87,7 +91,7 @@ gradientTexture05.minFilter = THREE.NearestFilter;
 // material.side = THREE.DoubleSide;
 // material.alphaMap = doorAlpha;
 
-/*
+/*==============================================================
   - MeshNormalMaterial
     Esta setea una textura que es igual desde cualquier angulo, y pone los colores
     que utilizan las imagenes de Normal
@@ -95,7 +99,7 @@ gradientTexture05.minFilter = THREE.NearestFilter;
 // const material = new THREE.MeshNormalMaterial();
 // material.flatShading = true;
 
-/*
+/*==============================================================
   - MeshMatcapMaterial 
     Es para poner una textura que da mucha performance, pero desde cualquier angulo
     siempre se va a ver igual
@@ -103,7 +107,7 @@ gradientTexture05.minFilter = THREE.NearestFilter;
 // const material = new THREE.MeshMatcapMaterial();
 // material.matcap = matcapsTexture08;
 
-/*
+/*==============================================================
   - MeshDepthMaterial
     Este no es muy utilizado, es para ver lo profundo o lejano que esta un objeto a 
     la camara
@@ -111,7 +115,7 @@ gradientTexture05.minFilter = THREE.NearestFilter;
 // const material = new THREE.MeshDepthMaterial();
 // material.matcap = matcapsTexture08;
 
-/*
+/*==============================================================
   - MeshLambertMaterial
     Este necesita luz para poder verse, pose la misma propiedades que el MeshBasicMaterial
     y otros mas que tiene que ver con la luz. Es es que tiene mas performance de los que
@@ -121,9 +125,9 @@ gradientTexture05.minFilter = THREE.NearestFilter;
     patrones extraños y no se vea del todo bien.
 */
 // const material = new THREE.MeshLambertMaterial();
-// material.matcap = matcapsTexture08;
+// material.map = matcapsTexture07;
 
-/*
+/*==============================================================
   - MeshPhongMaterial;
     Es menos performant que  el MeshLambertMaterial, pero no habran glitches raros.
     A pequeña escala la performance no importa mucho
@@ -132,28 +136,101 @@ gradientTexture05.minFilter = THREE.NearestFilter;
 // material.shininess = 100;
 // material.specular = new THREE.Color("red");
 
-/*
+/*==============================================================
   - MeshToonMaterial;
     Tiene un estilo caricaturesco, tiene un performance promedio. Por defecto solo 
     tiene 2 steps, uno mas claro y otro con sombra. Se pueden añadir mas sombras con
     un GradientTexture en en GradientMap
 */
-// const material = new THREE.MeshToonMaterial();
-// material.gradientMap = gradientTexture03;
+const material = new THREE.MeshToonMaterial();
+material.gradientMap = gradientTexture03;
 
-/*
+/*==============================================================
   - MeshStandardMaterial;
     Utiliza tecnicas de renderizados basados en la vida real. Necesita la luz, pero con
     un algoritmo mejor y con mejores parametro como metalness y roughness. Se llama
     "Standard", porque PBR se ha convertido en el standard en muchos softwares.
 */
-const material = new THREE.MeshStandardMaterial();
-material.metalness = 0.5;
-material.roughness = 0.7;
+// const material = new THREE.MeshStandardMaterial();
+// material.metalness = 1;
+// material.roughness = 1;
+// material.metalnessMap = doorMetalness;
+// material.roughnessMap = doorRoughness;
 
-const geometrySphere = new THREE.SphereGeometry(0.5, 16, 16);
-const geometryTorus = new THREE.TorusGeometry(0.5, 0.3, 16, 32);
-const geometryPlane = new THREE.PlaneGeometry(1, 1, 1, 1);
+// material.map = doorColor;
+
+// material.aoMap = doorAmbientOcclusion;
+
+// material.displacementMap = doorHeight;
+// material.displacementScale = 0.078;
+
+// material.normalMap = doorNormal;
+
+// material.transparent = true;
+// material.alphaMap = doorAlpha;
+
+// gui.add(material, "metalness", 0, 1, 0.001);
+// gui.add(material, "roughness", 0, 1, 0.001);
+// gui.add(material, "displacementScale", 0, 1, 0.001);
+
+/*
+============================================================================================================================
+- MeshPhysicalMaterial;
+Lo mismo que el StandarMaterial, pero con mas propiedades
+==============================================================
+*/
+// const material = new THREE.MeshPhysicalMaterial();
+// material.metalness = 0;
+// material.roughness = 0;
+// material.metalnessMap = doorMetalness;
+// material.roughnessMap = doorRoughness;
+
+// material.map = doorColor;
+
+// material.aoMap = doorAmbientOcclusion;
+
+// material.displacementMap = doorHeight;
+// material.displacementScale = 0.078;
+
+// material.normalMap = doorNormal;
+
+// material.transparent = true;
+// material.alphaMap = doorAlpha;
+
+// material.clearcoat = 1;
+// material.clearcoatRoughness = 0;
+// gui.add(material, "clearcoat", 0, 1, 0.001);
+// gui.add(material, "clearcoatRoughness", 0, 1, 0.001);
+
+// material.sheen = 1;
+// material.sheenRoughness = 0;
+// material.sheenColor.set(1, 1, 1);
+
+// gui.add(material, "sheen", 0, 1, 0.001);
+// gui.add(material, "sheenRoughness", 0, 1, 0.001);
+// gui.addColor(material, "sheenColor");
+
+// material.iridescence = 1;
+// material.iridescenceIOR = 1;
+// material.iridescenceThicknessRange = [100, 800];
+
+// gui.add(material, "iridescence", 0, 1, 0.001);
+// gui.add(material, "iridescenceIOR", 0, 2.333, 0.001);
+// gui.add(material.iridescenceThicknessRange, "0", 1, 1000, 0.001);
+// gui.add(material.iridescenceThicknessRange, "1", 1, 1000, 0.001);
+
+// material.transmission = 1;
+// material.ior = 1.5;
+// material.thickness = 0.5;
+// gui.add(material, "transmission", 0, 1, 0.001);
+// gui.add(material, "ior", 0, 10, 0.001);
+// gui.add(material, "thickness", 0, 1, 0.001);
+// gui.add(material, "roughness", 0, 1, 0.001);
+// gui.add(material, "metalness", 0, 1, 0.001);
+
+const geometrySphere = new THREE.SphereGeometry(0.5, 64, 64);
+const geometryTorus = new THREE.TorusGeometry(0.5, 0.3, 64, 128);
+const geometryPlane = new THREE.PlaneGeometry(1, 1, 200, 200);
 const mesh1 = new THREE.Mesh(geometrySphere, material);
 const mesh2 = new THREE.Mesh(geometryTorus, material);
 const mesh3 = new THREE.Mesh(geometryPlane, material);
@@ -169,7 +246,7 @@ mesh2.position.x = 2;
 /**
  * ambientLigth
  */
-// const ambientLigth = new THREE.AmbientLight("#ffffff", 1);
+// const ambientLigth = new THREE.AmbientLight("#ffffff", 0.03);
 // scene.add(ambientLigth);
 
 /**
@@ -180,6 +257,16 @@ pointLight.position.x = 2;
 pointLight.position.y = 3;
 pointLight.position.z = 4;
 scene.add(pointLight);
+
+// HDRI
+
+const rgbeLoader = new RGBELoader();
+rgbeLoader.load("/textures/environmentMap/2k.hdr", (enviromentMap) => {
+  console.log(enviromentMap);
+  enviromentMap.mapping = THREE.EquirectangularReflectionMapping;
+  scene.background = enviromentMap;
+  scene.environment = enviromentMap;
+});
 
 /**
  * Camera
@@ -213,7 +300,6 @@ const tick = () => {
   mesh1.rotation.y = 0.1 * elapsedTime;
   mesh2.rotation.y = 0.1 * elapsedTime;
   mesh3.rotation.y = 0.1 * elapsedTime;
-
   mesh1.rotation.x = -0.15 * elapsedTime;
   mesh2.rotation.x = -0.15 * elapsedTime;
   mesh3.rotation.x = -0.15 * elapsedTime;
