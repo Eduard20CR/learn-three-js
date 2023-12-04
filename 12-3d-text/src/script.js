@@ -20,11 +20,13 @@ const scene = new THREE.Scene();
  * Textures
  */
 const textureLoader = new THREE.TextureLoader();
+const matcapTexture = textureLoader.load("/textures/matcaps/3.png");
 
 /**
  * Object
  */
-const cube = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial());
+
+// const cube = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial());
 
 // scene.add(cube);
 
@@ -35,23 +37,46 @@ const cube = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicM
 const fontLoader = new FontLoader();
 
 fontLoader.load("/fonts/helvetiker_regular.typeface.json", (f) => {
-  console.log(f);
+  const greenMaterial = new THREE.MeshMatcapMaterial({ matcap: matcapTexture });
+  const donutGeometry = new THREE.TorusGeometry(0.3, 0.2, 20, 45);
   const textGeometry = new TextGeometry("Lambebicho", {
     font: f,
     size: 0.5,
     height: 0.2,
-    curveSegments: 12,
+    curveSegments: 6,
     bevelEnabled: true,
     bevelThickness: 0.03,
     bevelSize: 0.02,
     bevelOffset: 0,
-    bevelSegments: 5,
+    bevelSegments: 4,
   });
+  textGeometry.center();
+  // textGeometry.computeBoundingBox();
 
-  const textMaterial = new THREE.MeshBasicMaterial();
+  // textGeometry.translate(
+  //   (textGeometry.boundingBox.max.x - -0.02) * -0.5,
+  //   (textGeometry.boundingBox.max.y - -0.02) * -0.5,
+  //   (textGeometry.boundingBox.max.z - -0.03) * -0.5
+  // );
+  // console.log(textGeometry.boundingBox);
 
-  const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+  // textMaterial.wireframe = true;
+  const textMesh = new THREE.Mesh(textGeometry, greenMaterial);
   scene.add(textMesh);
+
+  for (let i = 0; i < 500; i++) {
+    const donut = new THREE.Mesh(donutGeometry, greenMaterial);
+    donut.position.x = (Math.random() - 0.5) * 10;
+    donut.position.y = (Math.random() - 0.5) * 10;
+    donut.position.z = (Math.random() - 0.5) * 10;
+
+    donut.rotation.x = Math.random() * Math.PI;
+    donut.rotation.y = Math.random() * Math.PI;
+
+    const newScale = Math.max(Math.random(), 0.4);
+    donut.scale.set(newScale, newScale, newScale);
+    scene.add(donut);
+  }
 });
 
 /**
@@ -77,13 +102,20 @@ window.addEventListener("resize", () => {
 });
 
 /**
+ * AXIS HELPER
+ */
+
+// const axisHelper = new THREE.AxesHelper(2);
+// scene.add(axisHelper);
+
+/**
  * Camera
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100);
-camera.position.x = 1;
-camera.position.y = 1;
-camera.position.z = 2;
+// camera.position.x = 1;
+// camera.position.y = 1;
+camera.position.z = 3;
 scene.add(camera);
 
 // Controls
