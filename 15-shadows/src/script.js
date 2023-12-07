@@ -18,22 +18,42 @@ const scene = new THREE.Scene();
  * Lights
  */
 // Ambient light
-const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
 gui.add(ambientLight, "intensity").min(0).max(3).step(0.001);
 scene.add(ambientLight);
 
 // Directional light
-const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
 directionalLight.position.set(2, 2, -1);
 directionalLight.castShadow = true;
 directionalLight.shadow.mapSize.x = 1024;
 directionalLight.shadow.mapSize.y = 1024;
+directionalLight.shadow.camera.far = 5;
+directionalLight.shadow.camera.left = -1.5;
+directionalLight.shadow.camera.right = 1.5;
+directionalLight.shadow.camera.top = -1.5;
+directionalLight.shadow.camera.bottom = 1.5;
+// This one does no work with THREE.PCFSoftShadowMap, it works work witdh THREE.PCFShadowMap
+directionalLight.shadow.radius = 10;
 
 gui.add(directionalLight, "intensity").min(0).max(3).step(0.001);
 gui.add(directionalLight.position, "x").min(-5).max(5).step(0.001);
 gui.add(directionalLight.position, "y").min(-5).max(5).step(0.001);
 gui.add(directionalLight.position, "z").min(-5).max(5).step(0.001);
-scene.add(directionalLight);
+
+const directionalLigthCameraHelper = new THREE.CameraHelper(directionalLight.shadow.camera);
+directionalLigthCameraHelper.visible = false;
+scene.add(directionalLight, directionalLigthCameraHelper);
+
+// Spot Ligth
+const spotLigth = new THREE.SpotLight("#ffffff", 6, 10, Math.PI * 0.3);
+spotLigth.shadow.radius = 3;
+const spotLigthCameraHelper = new THREE.CameraHelper(spotLigth.shadow.camera);
+spotLigth.castShadow = true;
+spotLigth.position.set(0, 2, 2);
+spotLigth.shadow.mapSize.x = 1024;
+spotLigth.shadow.mapSize.y = 1024;
+scene.add(spotLigth, spotLigth.target, spotLigthCameraHelper);
 
 /**
  * Materials
@@ -99,6 +119,7 @@ const renderer = new THREE.WebGLRenderer({
   canvas: canvas,
 });
 renderer.shadowMap.enabled = true;
+// renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
