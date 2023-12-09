@@ -18,7 +18,7 @@ const scene = new THREE.Scene();
  * Lights
  */
 // Ambient light
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
 gui.add(ambientLight, "intensity").min(0).max(3).step(0.001);
 scene.add(ambientLight);
 
@@ -34,7 +34,7 @@ directionalLight.shadow.camera.right = 1.5;
 directionalLight.shadow.camera.top = -1.5;
 directionalLight.shadow.camera.bottom = 1.5;
 // This one does no work with THREE.PCFSoftShadowMap, it works work witdh THREE.PCFShadowMap
-directionalLight.shadow.radius = 10;
+// directionalLight.shadow.radius = 10;
 
 gui.add(directionalLight, "intensity").min(0).max(3).step(0.001);
 gui.add(directionalLight.position, "x").min(-5).max(5).step(0.001);
@@ -46,18 +46,45 @@ directionalLigthCameraHelper.visible = false;
 scene.add(directionalLight, directionalLigthCameraHelper);
 
 // Spot Ligth
-const spotLigth = new THREE.SpotLight("#ffffff", 6, 10, Math.PI * 0.3);
-spotLigth.shadow.radius = 3;
+const spotLigth = new THREE.SpotLight("#ffffff", 3, 10, Math.PI * 0.3);
 const spotLigthCameraHelper = new THREE.CameraHelper(spotLigth.shadow.camera);
-spotLigth.castShadow = true;
 spotLigth.position.set(0, 2, 2);
+spotLigth.castShadow = true;
+// spotLigth.shadow.radius = 3;
 spotLigth.shadow.mapSize.x = 1024;
 spotLigth.shadow.mapSize.y = 1024;
+spotLigth.shadow.camera.near = 0.1;
+spotLigthCameraHelper.visible = false;
 scene.add(spotLigth, spotLigth.target, spotLigthCameraHelper);
+
+// Poing Ligth
+
+const pointLigth = new THREE.PointLight(0xffffff, 3.7);
+pointLigth.castShadow = true;
+pointLigth.position.set(-1, 1, 0);
+pointLigth.shadow.mapSize.x = 1024;
+pointLigth.shadow.mapSize.y = 1024;
+pointLigth.shadow.camera.near = 0.2;
+pointLigth.shadow.camera.far = 5;
+
+const pointLigthCameraHelper = new THREE.CameraHelper(pointLigth.shadow.camera);
+pointLigthCameraHelper.visible = false;
+
+scene.add(pointLigth, pointLigthCameraHelper);
+
+// TEXTURES
+
+const textureLoader = new THREE.TextureLoader();
+const bakedShadow = textureLoader.load("/textures/bakedShadow.jpg");
+const simpleShadow = textureLoader.load("/textures/simpleShadow.jpg");
+bakedShadow.colorSpace = THREE.SRGBColorSpace;
+// MATERIAL
 
 /**
  * Materials
  */
+const bakedMaterial = new THREE.MeshBasicMaterial({ map: bakedShadow });
+const bakedMaterialCircle = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, alphaMap: simpleShadow });
 const material = new THREE.MeshStandardMaterial();
 material.roughness = 0.7;
 gui.add(material, "metalness").min(0).max(1).step(0.001);
@@ -66,6 +93,7 @@ gui.add(material, "roughness").min(0).max(1).step(0.001);
 /**
  * Objects
  */
+
 const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 32), material);
 sphere.castShadow = true;
 
@@ -74,7 +102,11 @@ plane.receiveShadow = true;
 plane.rotation.x = -Math.PI * 0.5;
 plane.position.y = -0.5;
 
-scene.add(sphere, plane);
+const sphereShadowPlaneGeometry = new THREE.PlaneGeometry(1.5, 1.5);
+const sphereShadowPlaneMesh = new THREE.Mesh(sphereShadowPlaneGeometry, bakedMaterialCircle);
+sphereShadowPlaneMesh.rotation.x = -Math.PI * 0.5;
+sphereShadowPlaneMesh.position.y = plane.position.y + 0.1;
+scene.add(sphere, plane, sphereShadowPlaneMesh);
 
 /**
  * Sizes
@@ -118,8 +150,9 @@ controls.enableDamping = true;
 const renderer = new THREE.WebGLRenderer({
   canvas: canvas,
 });
-renderer.shadowMap.enabled = true;
+// renderer.shadowMap.enabled = true;
 // renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+// renderer.shadowMap.type = THREE.BasicShadowMap;
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
@@ -131,10 +164,23 @@ const clock = new THREE.Clock();
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
 
-  //   const radius = 3;
-  //   directionalLight.position.x = Math.cos(elapsedTime) * radius;
-  //   directionalLight.position.z = Math.sin(elapsedTime) * radius;
-  //   directionalLight.position.y = Math.cos(elapsedTime) + 1.5;
+  const radius = 1;
+  sphere.position.x = Math.cos(elapsedTime * 4) * radius;
+  // sphere.position.z = Math.sin(elapsedTime * 2) * radius;
+  sphere.position.y = Math.abs(Math.cos(elapsedTime * 4)) * 0.5;
+
+  const max = 1;
+  let opacity;
+  if (sphere.position.y >= max) {
+    opacity = 0;
+  } else if (sphere.position.y <= 0) {
+    opacity = 1;
+  } else {
+    opacity = max - sphere.position.y;
+  }
+
+  sphereShadowPlaneMesh.material.opacity = opacity;
+  sphereShadowPlaneMesh.position.set(sphere.position.x, plane.position.y + 0.01, sphere.position.z);
 
   // Update controls
   controls.update();
