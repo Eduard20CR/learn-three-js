@@ -142,8 +142,8 @@ gradientTexture05.minFilter = THREE.NearestFilter;
     tiene 2 steps, uno mas claro y otro con sombra. Se pueden añadir mas sombras con
     un GradientTexture en en GradientMap
 */
-const material = new THREE.MeshToonMaterial();
-material.gradientMap = gradientTexture03;
+// const material = new THREE.MeshToonMaterial();
+// material.gradientMap = gradientTexture03;
 
 /*==============================================================
   - MeshStandardMaterial;
@@ -151,27 +151,27 @@ material.gradientMap = gradientTexture03;
     un algoritmo mejor y con mejores parametro como metalness y roughness. Se llama
     "Standard", porque PBR se ha convertido en el standard en muchos softwares.
 */
-// const material = new THREE.MeshStandardMaterial();
-// material.metalness = 1;
-// material.roughness = 1;
-// material.metalnessMap = doorMetalness;
-// material.roughnessMap = doorRoughness;
+const material = new THREE.MeshStandardMaterial();
+material.metalness = 1;
+material.roughness = 1;
+material.metalnessMap = doorMetalness;
+material.roughnessMap = doorRoughness;
 
-// material.map = doorColor;
+material.map = doorColor;
 
-// material.aoMap = doorAmbientOcclusion;
+material.aoMap = doorAmbientOcclusion;
 
-// material.displacementMap = doorHeight;
-// material.displacementScale = 0.078;
+material.displacementMap = doorHeight;
+material.displacementScale = 0.078;
 
-// material.normalMap = doorNormal;
+material.normalMap = doorNormal;
 
-// material.transparent = true;
-// material.alphaMap = doorAlpha;
+material.transparent = true;
+material.alphaMap = doorAlpha;
 
-// gui.add(material, "metalness", 0, 1, 0.001);
-// gui.add(material, "roughness", 0, 1, 0.001);
-// gui.add(material, "displacementScale", 0, 1, 0.001);
+gui.add(material, "metalness", 0, 1, 0.001);
+gui.add(material, "roughness", 0, 1, 0.001);
+gui.add(material, "displacementScale", 0, 1, 0.001);
 
 /*
 ============================================================================================================================
@@ -273,7 +273,7 @@ rgbeLoader.load("/textures/environmentMap/2k.hdr", (enviromentMap) => {
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100);
-camera.position.z = 5;
+camera.position.z = 1;
 scene.add(camera);
 
 // Controls
