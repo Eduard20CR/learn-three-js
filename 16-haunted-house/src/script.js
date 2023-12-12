@@ -32,7 +32,7 @@ scene.add(house);
 const wallsColorTexture = textureLoader.load("/textures/bricks/color.jpg");
 wallsColorTexture.colorSpace = THREE.SRGBColorSpace;
 const wallsAbientOcclusionTexture = textureLoader.load("/textures/bricks/ambientOcclusion.jpg");
-const wallsNormalTexture = textureLoader.load("/textures/bricks/color.jpg");
+const wallsNormalTexture = textureLoader.load("/textures/bricks/normal.jpg");
 const wallsRoughnessTexture = textureLoader.load("/textures/bricks/roughness.jpg");
 
 const walls = new THREE.Mesh(
@@ -54,7 +54,36 @@ house.add(roof);
 roof.position.y = 2.5 + 2 / 2;
 
 // Floor
-const floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.MeshStandardMaterial({ color: "#a9c388" }));
+const grassColorTexture = textureLoader.load("/textures/grass/color.jpg");
+grassColorTexture.colorSpace = THREE.SRGBColorSpace;
+const grassAbientOcclusionTexture = textureLoader.load("/textures/grass/ambientOcclusion.jpg");
+const grassNormalTexture = textureLoader.load("/textures/grass/normal.jpg");
+const grassRoughnessTexture = textureLoader.load("/textures/grass/roughness.jpg");
+
+grassColorTexture.repeat.set(8, 8);
+grassAbientOcclusionTexture.repeat.set(8, 8);
+grassNormalTexture.repeat.set(8, 8);
+grassRoughnessTexture.repeat.set(8, 8);
+
+grassColorTexture.wrapT = THREE.RepeatWrapping;
+grassAbientOcclusionTexture.wrapT = THREE.RepeatWrapping;
+grassNormalTexture.wrapT = THREE.RepeatWrapping;
+grassRoughnessTexture.wrapT = THREE.RepeatWrapping;
+
+grassColorTexture.wrapS = THREE.RepeatWrapping;
+grassAbientOcclusionTexture.wrapS = THREE.RepeatWrapping;
+grassNormalTexture.wrapS = THREE.RepeatWrapping;
+grassRoughnessTexture.wrapS = THREE.RepeatWrapping;
+
+const floor = new THREE.Mesh(
+  new THREE.PlaneGeometry(40, 40),
+  new THREE.MeshStandardMaterial({
+    map: grassColorTexture,
+    aoMap: grassAbientOcclusionTexture,
+    normalMap: grassNormalTexture,
+    roughnessMap: grassRoughnessTexture,
+  })
+);
 floor.rotation.x = -Math.PI * 0.5;
 floor.position.y = 0;
 scene.add(floor);
@@ -130,20 +159,31 @@ for (let i = 0; i < 50; i++) {
   const xPosition = Math.sin(angle) * radius;
   const zPosition = Math.cos(angle) * radius;
 
+  grave.castShadow = true;
+
   grave.position.set(xPosition, 0.35, zPosition);
   grave.rotation.set(0, (Math.random() - 0.5) * 0.3, (Math.random() - 0.5) * 0.3);
 }
 
 /**
+ * Ghost
+ */
+
+const ghost1 = new THREE.PointLight("#ff00ff", 6, 2);
+const ghost2 = new THREE.PointLight("#00ffff", 6, 2);
+const ghost3 = new THREE.PointLight("#ffff00", 6, 2);
+scene.add(ghost1, ghost2, ghost3);
+
+/**
  * Lights
  */
 // Ambient light
-const ambientLight = new THREE.AmbientLight("#b9d5ff", 0.12);
+const ambientLight = new THREE.AmbientLight("#b9d5ff", 0.02);
 gui.add(ambientLight, "intensity").min(0).max(1).step(0.001);
 scene.add(ambientLight);
 
 // Directional light
-const moonLight = new THREE.DirectionalLight("#b9d5ff", 0.26);
+const moonLight = new THREE.DirectionalLight("#b9d5ff", 0.0);
 moonLight.position.set(4, 5, -2);
 gui.add(moonLight, "intensity").min(0).max(1).step(0.001);
 gui.add(moonLight.position, "x").min(-5).max(5).step(0.001);
@@ -155,13 +195,14 @@ scene.add(moonLight);
 
 const doorLight = new THREE.PointLight("#ff7d46", 4, 15);
 house.add(doorLight);
+
 doorLight.position.set(0, 2, 3);
 
 /**
  * Fog
  */
 
-const fog = new THREE.Fog("#262837", 1, 15);
+const fog = new THREE.Fog("#262837", 1, 20);
 scene.fog = fog;
 
 /**
@@ -191,12 +232,12 @@ window.addEventListener("resize", () => {
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100);
-// camera.position.x = 7;
-// camera.position.y = 2;
-// camera.position.z = 7;
-camera.position.x = 0;
+camera.position.x = 7;
 camera.position.y = 2;
-camera.position.z = 4;
+camera.position.z = 7;
+// camera.position.x = 0;
+// camera.position.y = 2;
+// camera.position.z = 4;
 scene.add(camera);
 
 // Controls
@@ -212,6 +253,44 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setClearColor("#262837");
+
+/**
+ * Shadow
+ */
+
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+walls.castShadow = true;
+roof.castShadow = true;
+ghost1.castShadow = true;
+ghost2.castShadow = true;
+ghost3.castShadow = true;
+moonLight.castShadow = true;
+doorLight.castShadow = true;
+bush1.castShadow = true;
+bush2.castShadow = true;
+bush3.castShadow = true;
+
+walls.receiveShadow = true;
+floor.receiveShadow = true;
+
+ghost1.shadow.mapSize.width = 256;
+ghost1.shadow.mapSize.height = 256;
+ghost1.shadow.camera.far = 5;
+
+ghost2.shadow.mapSize.width = 256;
+ghost2.shadow.mapSize.height = 256;
+ghost2.shadow.camera.far = 5;
+
+ghost3.shadow.mapSize.width = 256;
+ghost3.shadow.mapSize.height = 256;
+ghost3.shadow.camera.far = 5;
+
+doorLight.shadow.mapSize.width = 256;
+doorLight.shadow.mapSize.height = 256;
+doorLight.shadow.camera.far = 5;
+
 /**
  * Animate
  */
@@ -219,6 +298,17 @@ const clock = new THREE.Clock();
 
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
+
+  ghost1.position.x = Math.cos(elapsedTime) * (7 + Math.sin(elapsedTime * 0.3));
+  ghost1.position.z = Math.sin(elapsedTime) * (7 + Math.sin(elapsedTime * 0.5));
+
+  ghost2.position.x = Math.cos(elapsedTime * 3) * 5;
+  ghost2.position.z = Math.sin(elapsedTime * 3) * 5;
+
+  ghost3.position.x = Math.cos(elapsedTime * -0.4) * 7;
+  ghost3.position.z = Math.sin(elapsedTime * -0.4) * 7;
+
+  ghost3.position.y = Math.sin(elapsedTime) + 1;
 
   // Update controls
   controls.update();
