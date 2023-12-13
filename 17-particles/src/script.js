@@ -72,7 +72,9 @@ const particleMaterial = new THREE.PointsMaterial({
 // Points
 
 const points = new THREE.Points(customParticleGeometry, particleMaterial);
-scene.add(points);
+const point2 = points.clone();
+point2.position.y = 10;
+scene.add(points, point2);
 
 /**
  * Sizes
@@ -124,7 +126,17 @@ const clock = new THREE.Clock();
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
 
-  points.rotation.y += 0.0001 * Math.PI;
+  console.log(Math.tan(elapsedTime * 1000));
+
+  points.position.y += -0.02;
+  point2.position.y += -0.02;
+  points.rotation.y += 0.002;
+  point2.rotation.y += 0.002;
+
+  if (points.position.y <= -10) {
+    points.position.y = 0;
+    point2.position.y = 10;
+  }
 
   // Update controls
   controls.update();
