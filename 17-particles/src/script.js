@@ -126,16 +126,16 @@ const clock = new THREE.Clock();
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
 
-  console.log(Math.tan(elapsedTime * 1000));
+  // points.rotation.y += 0.0001 * Math.PI;
 
-  points.position.y += -0.02;
-  point2.position.y += -0.02;
-  points.rotation.y += 0.002;
-  point2.rotation.y += 0.002;
+  for (let i = 0; i < count; i++) {
+    const geometryArray = points.geometry.attributes.position;
+    // const x = i * 3;
+    const y = i * 3 + 1;
+    const z = i * 3 + 2;
 
-  if (points.position.y <= -10) {
-    points.position.y = 0;
-    point2.position.y = 10;
+    geometryArray.array[y] = Math.sin(elapsedTime + geometryArray.array[z]);
+    geometryArray.needsUpdate = true;
   }
 
   // Update controls
